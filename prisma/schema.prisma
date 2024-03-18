@@ -15,6 +15,7 @@ model Post {
   updatedAt   DateTime @updatedAt
   authorId    Int
   author      User     @relation(fields: [authorId], references: [id])
+  Like        Like[]
 }
 
 model User {
@@ -25,6 +26,7 @@ model User {
   updatedAt DateTime  @updatedAt
   posts     Post[]
   sessions  Session[]
+  Like      Like[]
 }
 
 model Session {
@@ -34,4 +36,14 @@ model Session {
   expiresAt DateTime
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  postId    Int
+  post      Post     @relation(fields: [postId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
