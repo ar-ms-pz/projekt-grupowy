@@ -2,14 +2,33 @@ import { Request, Response } from 'express';
 import { EditPostParams } from './params';
 import { EditPostDto } from './dto';
 import { prisma } from '../../../../db/prisma';
+import { User } from '@prisma/client';
+import { errorCatcher } from '../../../../middlewares/error-catcher';
 
-export const editPost = async (req: Request, res: Response) => {
+export const editPost = errorCatcher(async (req: Request, res: Response) => {
     const { postId } = req.params as unknown as EditPostParams;
+    const { id: userId } = req.user as User;
     const dto: EditPostDto = req.body;
 
     const post = await prisma.post.findFirst({
         where: {
             id: postId,
+            authorId: userId,
+        },
+        select: {
+            id: true,
+            description: true,
+            image: true,
+            createdAt: true,
+            updatedAt: true,
+            author: {
+                select: {
+                    id: true,
+                    name: true,
+                    createdAt: true,
+                    updatedAt: true,
+                },
+            },
         },
     });
 
@@ -37,4 +56,4 @@ export const editPost = async (req: Request, res: Response) => {
     res.status(200).json({
         data: updatedPost,
     });
-};
+});

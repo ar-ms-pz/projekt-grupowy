@@ -1,4 +1,8 @@
 {
+    "ts-node": {
+        "files": true
+    },
+    "files": ["src/types/index.d.ts"],
     "compilerOptions": {
         "target": "es2016",
         "module": "commonjs",
@@ -8,5 +12,5 @@
         "skipLibCheck": true,
         "outDir": "dist"
     },
-    "include": ["src/**/*.ts"]
+    "include": ["src/**/*.ts", "src/types"]
 }

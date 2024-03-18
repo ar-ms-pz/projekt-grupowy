@@ -2,13 +2,17 @@ import { Request, Response } from 'express';
 import { DeletePostParams } from './params';
 import { prisma } from '../../../../db/prisma';
 import { rmSync } from 'fs';
+import { User } from '@prisma/client';
+import { errorCatcher } from '../../../../middlewares/error-catcher';
 
-export const deletePost = async (req: Request, res: Response) => {
+export const deletePost = errorCatcher(async (req: Request, res: Response) => {
     const { postId } = req.params as unknown as DeletePostParams;
+    const { id: userId } = req.user as User;
 
     const post = await prisma.post.findFirst({
         where: {
             id: postId,
+            authorId: userId,
         },
     });
 
@@ -34,4 +38,4 @@ export const deletePost = async (req: Request, res: Response) => {
     res.status(200).json({
         data: null,
     });
-};
+});

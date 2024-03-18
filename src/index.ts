@@ -14,27 +14,53 @@ import { getPostParamsSchema } from './api/posts/{id}/GET/params';
 import { deletePostParamsSchema } from './api/posts/{id}/DELETE/params';
 import { editPostParamsSchema } from './api/posts/{id}/PATCH/params';
 import { editPostDtoSchema } from './api/posts/{id}/PATCH/dto';
+import { PORT, SESSION_CLEANUP_INTERVAL_MS } from './config';
+import { clearExpiredSessions } from './auth/clear-expired-sessions';
+import { createJob } from './jobs/create-job';
+import { auth } from './middlewares/auth';
+import { registerDtoSchema } from './api/auth/register/POST/dto';
+import { login } from './api/auth/login/POST';
+import { loginDtoSchema } from './api/auth/login/POST/dto';
+import { register } from './api/auth/register/POST';
+import { extendSession } from './api/auth/extend-session/POST';
+import { logout } from './api/auth/logout/POST';
+import { errorHandler } from './middlewares/error-handler';
+import cookieParser from 'cookie-parser';
 
 const app: Express = express();
 
 app.use(json());
-
-const port = process.env.PORT || 3000;
-
+app.use(cookieParser());
 app.use('/images', express.static('images'));
 
 app.get('/posts', query(getPostsQuerySchema), getPosts);
-app.post('/posts', singleImage, dto(createPostDtoSchema, true), createPost);
+app.post(
+    '/posts',
+    auth,
+    singleImage,
+    dto(createPostDtoSchema, true),
+    createPost,
+);
 
 app.get('/posts/:postId', params(getPostParamsSchema), getPost);
 app.patch(
     '/posts/:postId',
+    auth,
     params(editPostParamsSchema),
     dto(editPostDtoSchema),
     editPost,
 );
-app.delete('/posts/:postId', params(deletePostParamsSchema), deletePost);
+app.delete('/posts/:postId', auth, params(deletePostParamsSchema), deletePost);
 
-app.listen(port, () => {
-    console.log(`[server]: Server is running at http://localhost:${port}`);
+app.post('/auth/register', dto(registerDtoSchema), register);
+app.post('/auth/login', dto(loginDtoSchema), login);
+app.post('/auth/logout', auth, logout);
+app.post('/auth/extend-session', auth, extendSession);
+
+app.use(errorHandler);
+
+app.listen(PORT, () => {
+    console.log(`[server]: Server is running at http://localhost:${PORT}`);
 });
+
+createJob(clearExpiredSessions, SESSION_CLEANUP_INTERVAL_MS);
