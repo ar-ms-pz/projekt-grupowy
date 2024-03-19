@@ -6,7 +6,9 @@
     "scripts": {
         "dev": "ts-node-dev --env-file=.env --respawn src/index.ts",
         "prisma": "prisma generate",
-        "prisma:migrate": "prisma migrate dev"
+        "prisma:migrate": "prisma migrate dev",
+        "prisma:studio": "prisma studio",
+        "typecheck": "tsc --noEmit"
     },
     "author": "",
     "license": "ISC",

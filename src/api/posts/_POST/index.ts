@@ -3,6 +3,7 @@ import { CreatePostDto } from './dto';
 import { prisma } from '../../../db/prisma';
 import { User } from '@prisma/client';
 import { errorCatcher } from '../../../middlewares/error-catcher';
+import { Post } from '../../../models/post';
 
 export const createPost = errorCatcher(async (req: Request, res: Response) => {
     const dto: CreatePostDto = req.body;
@@ -19,22 +20,9 @@ export const createPost = errorCatcher(async (req: Request, res: Response) => {
                 },
             },
         },
-        select: {
-            id: true,
-            description: true,
-            image: true,
-            createdAt: true,
-            updatedAt: true,
-            author: {
-                select: {
-                    id: true,
-                    name: true,
-                    createdAt: true,
-                    updatedAt: true,
-                },
-            },
-        },
     });
 
-    res.status(201).json({ data: post });
+    const serializedPost = Post.fromPrisma(post, req.user as User, 0, false);
+
+    res.status(201).json({ data: serializedPost });
 });

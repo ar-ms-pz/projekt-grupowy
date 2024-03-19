@@ -1,9 +1,10 @@
-import { Session } from '@prisma/client';
+import { Session, User as PrismaUser } from '@prisma/client';
 import { Request, Response } from 'express';
 import { prisma } from '../../../../db/prisma';
 import { generateToken } from '../../../../auth/generateToken';
 import { COOKIE_NAME, SESSION_LENGTH_MS } from '../../../../config';
 import { errorCatcher } from '../../../../middlewares/error-catcher';
+import { User } from '../../../../models/user';
 
 export const extendSession = errorCatcher(
     async (req: Request, res: Response) => {
@@ -27,6 +28,8 @@ export const extendSession = errorCatcher(
             httpOnly: true,
         });
 
-        res.status(200).json({ data: req.user });
+        const user = User.fromPrisma(req.user as PrismaUser);
+
+        res.status(200).json({ data: user });
     },
 );

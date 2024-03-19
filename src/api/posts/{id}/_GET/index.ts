@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { prisma } from '../../../../db/prisma';
 import { GetPostParams } from './params';
 import { errorCatcher } from '../../../../middlewares/error-catcher';
+import { Post } from '../../../../models/post';
 
 export const getPost = errorCatcher(async (req: Request, res: Response) => {
     const { postId } = req.params as unknown as GetPostParams;
@@ -10,20 +11,23 @@ export const getPost = errorCatcher(async (req: Request, res: Response) => {
         where: {
             id: postId,
         },
-        select: {
-            id: true,
-            description: true,
-            image: true,
-            createdAt: true,
-            updatedAt: true,
-            author: {
-                select: {
-                    id: true,
-                    name: true,
-                    createdAt: true,
-                    updatedAt: true,
+        include: {
+            author: true,
+            likes: {
+                where: {
+                    userId: req.user?.id,
                 },
             },
+        },
+    });
+
+    const likes = await prisma.like.groupBy({
+        by: ['postId'],
+        _count: {
+            postId: true,
+        },
+        where: {
+            postId,
         },
     });
 
@@ -39,7 +43,14 @@ export const getPost = errorCatcher(async (req: Request, res: Response) => {
         });
     }
 
+    const serializedPost = Post.fromPrisma(
+        post,
+        post.author,
+        likes[0]?._count.postId || 0,
+        !req.user?.id ? post.likes.length > 0 : null,
+    );
+
     res.status(200).json({
-        data: post,
+        data: serializedPost,
     });
 });

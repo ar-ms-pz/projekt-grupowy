@@ -4,6 +4,7 @@ import { prisma } from '../../../../db/prisma';
 import { hash } from 'argon2';
 import { generateToken } from '../../../../auth/generateToken';
 import { COOKIE_NAME, SESSION_LENGTH_MS } from '../../../../config';
+import { User } from '../../../../models/user';
 
 export const register = async (req: Request, res: Response) => {
     const dto: RegisterDto = req.body;
@@ -17,13 +18,6 @@ export const register = async (req: Request, res: Response) => {
             data: {
                 name: dto.username,
                 password: hashedPassword,
-            },
-            select: {
-                id: true,
-                name: true,
-                createdAt: true,
-                updatedAt: true,
-                password: false,
             },
         });
     } catch (error) {
@@ -52,5 +46,7 @@ export const register = async (req: Request, res: Response) => {
         httpOnly: true,
     });
 
-    res.status(200).json({ data: user });
+    const serializedUser = User.fromPrisma(user);
+
+    res.status(200).json({ data: serializedUser });
 };

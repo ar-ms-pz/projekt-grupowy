@@ -5,6 +5,7 @@ import { verify } from 'argon2';
 import { generateToken } from '../../../../auth/generateToken';
 import { COOKIE_NAME, SESSION_LENGTH_MS } from '../../../../config';
 import { errorCatcher } from '../../../../middlewares/error-catcher';
+import { User } from '../../../../models/user';
 
 export const login = errorCatcher(async (req: Request, res: Response) => {
     const { username, password }: LoginDto = req.body;
@@ -53,7 +54,7 @@ export const login = errorCatcher(async (req: Request, res: Response) => {
         httpOnly: true,
     });
 
-    const userWithoutPassword = { ...user, password: undefined };
+    const serializedUser = User.fromPrisma(user);
 
-    res.status(200).json({ data: userWithoutPassword });
+    res.status(200).json({ data: serializedUser });
 });

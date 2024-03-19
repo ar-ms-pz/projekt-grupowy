@@ -44,13 +44,6 @@ export const auth = errorCatcher(
             where: {
                 id: session.userId,
             },
-            select: {
-                id: true,
-                name: true,
-                createdAt: true,
-                updatedAt: true,
-                password: false,
-            },
         });
 
         if (!user) {

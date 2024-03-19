@@ -4,6 +4,7 @@ import { EditPostDto } from './dto';
 import { prisma } from '../../../../db/prisma';
 import { User } from '@prisma/client';
 import { errorCatcher } from '../../../../middlewares/error-catcher';
+import { Post } from '../../../../models/post';
 
 export const editPost = errorCatcher(async (req: Request, res: Response) => {
     const { postId } = req.params as unknown as EditPostParams;
@@ -14,21 +15,6 @@ export const editPost = errorCatcher(async (req: Request, res: Response) => {
         where: {
             id: postId,
             authorId: userId,
-        },
-        select: {
-            id: true,
-            description: true,
-            image: true,
-            createdAt: true,
-            updatedAt: true,
-            author: {
-                select: {
-                    id: true,
-                    name: true,
-                    createdAt: true,
-                    updatedAt: true,
-                },
-            },
         },
     });
 
@@ -51,9 +37,30 @@ export const editPost = errorCatcher(async (req: Request, res: Response) => {
         data: {
             description: dto.description,
         },
+        include: {
+            author: true,
+            likes: {
+                where: {
+                    userId,
+                },
+            },
+        },
     });
 
+    const likesCount = await prisma.like.count({
+        where: {
+            postId,
+        },
+    });
+
+    const serializedPost = Post.fromPrisma(
+        updatedPost,
+        updatedPost.author,
+        likesCount,
+        updatedPost.likes.length > 0,
+    );
+
     res.status(200).json({
-        data: updatedPost,
+        data: serializedPost,
     });
 });
