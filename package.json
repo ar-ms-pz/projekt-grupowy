@@ -8,7 +8,9 @@
         "prisma": "prisma generate",
         "prisma:migrate": "prisma migrate dev",
         "prisma:studio": "prisma studio",
-        "typecheck": "tsc --noEmit"
+        "typecheck": "tsc --noEmit",
+        "build": "tsc",
+        "build:run": "npm run build && node dist/index.js"
     },
     "author": "",
     "license": "ISC",

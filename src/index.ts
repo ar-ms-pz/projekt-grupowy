@@ -32,9 +32,11 @@ import { setLike } from './api/posts/{id}/set-like/_POST';
 import { getUserParamsSchema } from './api/users/{id}/_GET/params';
 import { getUser } from './api/users/{id}/_GET';
 import { whoAmI } from './api/who-am-i/_GET';
+import { requestLogger } from './middlewares/request-logger';
 
 const app: Express = express();
 
+app.use(requestLogger);
 app.use(json());
 app.use(cookieParser());
 app.use('/images', express.static('images'));
