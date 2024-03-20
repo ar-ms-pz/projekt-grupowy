@@ -43,28 +43,33 @@ app.use(json());
 app.use(cookieParser());
 app.use('/images', express.static('images'));
 
-app.get('/posts', query(getPostsQuerySchema), getPosts);
+app.get('/posts', auth(false), query(getPostsQuerySchema), getPosts);
 app.post(
     '/posts',
-    auth,
+    auth(),
     singleImage,
     dto(createPostDtoSchema, true),
     createPost,
 );
 
-app.get('/posts/:postId', params(getPostParamsSchema), getPost);
+app.get('/posts/:postId', auth(false), params(getPostParamsSchema), getPost);
 app.patch(
     '/posts/:postId',
-    auth,
+    auth(),
     params(editPostParamsSchema),
     dto(editPostDtoSchema),
     editPost,
 );
-app.delete('/posts/:postId', auth, params(deletePostParamsSchema), deletePost);
+app.delete(
+    '/posts/:postId',
+    auth(),
+    params(deletePostParamsSchema),
+    deletePost,
+);
 
 app.post(
     '/posts/:postId/set-like',
-    auth,
+    auth(),
     dto(setLikeDtoSchema),
     params(setLikeParamsSchema),
     setLike,
@@ -72,11 +77,11 @@ app.post(
 
 app.post('/auth/register', dto(registerDtoSchema), register);
 app.post('/auth/login', dto(loginDtoSchema), login);
-app.post('/auth/logout', auth, logout);
-app.post('/auth/extend-session', auth, extendSession);
+app.post('/auth/logout', auth(), logout);
+app.post('/auth/extend-session', auth(), extendSession);
 
-app.get('/who-am-i', auth, whoAmI);
-app.get('/users/:userId', params(getUserParamsSchema), getUser);
+app.get('/who-am-i', auth(), whoAmI);
+app.get('/users/:userId', auth(false), params(getUserParamsSchema), getUser);
 
 app.use(errorHandler);
 

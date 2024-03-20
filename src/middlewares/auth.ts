@@ -3,11 +3,12 @@ import { COOKIE_NAME } from '../config';
 import { prisma } from '../db/prisma';
 import { errorCatcher } from './error-catcher';
 
-export const auth = errorCatcher(
-    async (req: Request, res: Response, next: NextFunction) => {
+export const auth = (isMandatory = true) =>
+    errorCatcher(async (req: Request, res: Response, next: NextFunction) => {
         const cookie: string | undefined = req.cookies?.[COOKIE_NAME];
 
         if (!cookie) {
+            if (!isMandatory) next();
             return res.status(401).json({
                 errors: [
                     {
@@ -29,6 +30,8 @@ export const auth = errorCatcher(
         });
 
         if (!session) {
+            if (!isMandatory) next();
+
             return res.status(401).json({
                 errors: [
                     {
@@ -47,6 +50,8 @@ export const auth = errorCatcher(
         });
 
         if (!user) {
+            if (!isMandatory) next();
+
             return res.status(401).json({
                 errors: [
                     {
@@ -62,5 +67,4 @@ export const auth = errorCatcher(
         req.session = session;
 
         next();
-    },
-);
+    });
