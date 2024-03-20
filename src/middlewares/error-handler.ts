@@ -6,6 +6,8 @@ export const errorHandler = async (
     res: Response,
     next: NextFunction,
 ) => {
+    if (!err) return;
+
     res.status(500).send({
         errors: [
             {

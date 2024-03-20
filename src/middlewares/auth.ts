@@ -8,7 +8,8 @@ export const auth = (isMandatory = true) =>
         const cookie: string | undefined = req.cookies?.[COOKIE_NAME];
 
         if (!cookie) {
-            if (!isMandatory) next();
+            if (!isMandatory) return next();
+
             return res.status(401).json({
                 errors: [
                     {
@@ -30,7 +31,7 @@ export const auth = (isMandatory = true) =>
         });
 
         if (!session) {
-            if (!isMandatory) next();
+            if (!isMandatory) return next();
 
             return res.status(401).json({
                 errors: [
@@ -50,7 +51,7 @@ export const auth = (isMandatory = true) =>
         });
 
         if (!user) {
-            if (!isMandatory) next();
+            if (!isMandatory) return next();
 
             return res.status(401).json({
                 errors: [
