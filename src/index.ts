@@ -33,10 +33,12 @@ import { getUserParamsSchema } from './api/users/{id}/_GET/params';
 import { getUser } from './api/users/{id}/_GET';
 import { whoAmI } from './api/who-am-i/_GET';
 import { requestLogger } from './middlewares/request-logger';
+import { cors } from './middlewares/cors';
 
 const app: Express = express();
 
 app.use(requestLogger);
+app.use(cors);
 app.use(json());
 app.use(cookieParser());
 app.use('/images', express.static('images'));

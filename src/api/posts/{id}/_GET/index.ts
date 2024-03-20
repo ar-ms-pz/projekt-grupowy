@@ -47,7 +47,7 @@ export const getPost = errorCatcher(async (req: Request, res: Response) => {
         post,
         post.author,
         likes[0]?._count.postId || 0,
-        !req.user?.id ? post.likes.length > 0 : null,
+        req.user?.id ? post.likes.length > 0 : null,
     );
 
     res.status(200).json({

@@ -51,7 +51,7 @@ export const getPosts = errorCatcher(async (req: Request, res: Response) => {
             post,
             post.author,
             like?._count.postId || 0,
-            !req.user?.id ? post.likes.length > 0 : null,
+            req.user?.id ? post.likes.length > 0 : null,
         );
     });
 
