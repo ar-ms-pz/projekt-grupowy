@@ -2,47 +2,44 @@ import { NextFunction, Request, Response } from 'express';
 import { COOKIE_NAME } from '../config';
 import { prisma } from '../db/prisma';
 import { errorCatcher } from './error-catcher';
+import { deserializeSession } from '../auth/deserialize-session';
+import { verify } from 'argon2';
+
+const sendUnauthorized = (res: Response) => {
+    res.status(401).json({
+        errors: [
+            {
+                message: 'Unauthorized',
+                code: 'unauthorized',
+                path: [],
+            },
+        ],
+    });
+};
 
 export const auth = (isMandatory = true) =>
     errorCatcher(async (req: Request, res: Response, next: NextFunction) => {
         const cookie: string | undefined = req.cookies?.[COOKIE_NAME];
 
-        if (!cookie) {
-            if (!isMandatory) return next();
+        const cookieSession = cookie ? deserializeSession(cookie) : undefined;
 
-            return res.status(401).json({
-                errors: [
-                    {
-                        message: 'Unauthorized',
-                        code: 'unauthorized',
-                        path: [],
-                    },
-                ],
-            });
-        }
+        if (!cookieSession?.id)
+            return isMandatory ? sendUnauthorized(res) : next();
 
         const session = await prisma.session.findFirst({
             where: {
-                token: cookie,
+                id: cookieSession.id,
                 expiresAt: {
                     gte: new Date(),
                 },
             },
         });
 
-        if (!session) {
-            if (!isMandatory) return next();
+        if (!session) return isMandatory ? sendUnauthorized(res) : next();
 
-            return res.status(401).json({
-                errors: [
-                    {
-                        message: 'Unauthorized',
-                        code: 'unauthorized',
-                        path: [],
-                    },
-                ],
-            });
-        }
+        const isTokenValid = await verify(session.token, cookieSession.token);
+
+        if (!isTokenValid) return isMandatory ? sendUnauthorized(res) : next();
 
         const user = await prisma.user.findFirst({
             where: {
@@ -50,19 +47,7 @@ export const auth = (isMandatory = true) =>
             },
         });
 
-        if (!user) {
-            if (!isMandatory) return next();
-
-            return res.status(401).json({
-                errors: [
-                    {
-                        message: 'Unauthorized',
-                        code: 'unauthorized',
-                        path: [],
-                    },
-                ],
-            });
-        }
+        if (!user) return isMandatory ? sendUnauthorized(res) : next();
 
         req.user = user;
         req.session = session;

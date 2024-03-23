@@ -5,6 +5,8 @@ import { generateToken } from '../../../../auth/generateToken';
 import { COOKIE_NAME, SESSION_LENGTH_MS } from '../../../../config';
 import { errorCatcher } from '../../../../middlewares/error-catcher';
 import { User } from '../../../../models/user';
+import { serializeSession } from '../../../../auth/serialize-session';
+import { hash } from 'argon2';
 
 export const extendSession = errorCatcher(
     async (req: Request, res: Response) => {
@@ -13,17 +15,19 @@ export const extendSession = errorCatcher(
         const token = generateToken();
         const tokenExpiry = new Date(Date.now() + SESSION_LENGTH_MS);
 
-        await prisma.session.update({
+        const hashedToken = await hash(token);
+
+        const session = await prisma.session.update({
             where: {
                 id: sessionId,
             },
             data: {
-                token,
+                token: hashedToken,
                 expiresAt: tokenExpiry,
             },
         });
 
-        res.cookie(COOKIE_NAME, token, {
+        res.cookie(COOKIE_NAME, serializeSession(session, token), {
             expires: tokenExpiry,
             httpOnly: true,
         });

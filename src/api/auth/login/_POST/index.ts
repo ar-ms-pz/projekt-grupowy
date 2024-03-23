@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
 import { LoginDto } from './dto';
 import { prisma } from '../../../../db/prisma';
-import { verify } from 'argon2';
+import { hash, verify } from 'argon2';
 import { generateToken } from '../../../../auth/generateToken';
 import { COOKIE_NAME, SESSION_LENGTH_MS } from '../../../../config';
 import { errorCatcher } from '../../../../middlewares/error-catcher';
 import { User } from '../../../../models/user';
+import { serializeSession } from '../../../../auth/serialize-session';
 
 export const login = errorCatcher(async (req: Request, res: Response) => {
     const { username, password }: LoginDto = req.body;
@@ -41,15 +42,17 @@ export const login = errorCatcher(async (req: Request, res: Response) => {
     const token = generateToken();
     const tokenExpiry = new Date(Date.now() + SESSION_LENGTH_MS);
 
-    await prisma.session.create({
+    const hashedToken = await hash(token);
+
+    const session = await prisma.session.create({
         data: {
             userId: user.id,
-            token,
+            token: hashedToken,
             expiresAt: tokenExpiry,
         },
     });
 
-    res.cookie(COOKIE_NAME, token, {
+    res.cookie(COOKIE_NAME, serializeSession(session, token), {
         expires: tokenExpiry,
         httpOnly: true,
     });

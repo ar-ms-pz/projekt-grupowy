@@ -5,6 +5,7 @@ import { hash } from 'argon2';
 import { generateToken } from '../../../../auth/generateToken';
 import { COOKIE_NAME, SESSION_LENGTH_MS } from '../../../../config';
 import { User } from '../../../../models/user';
+import { serializeSession } from '../../../../auth/serialize-session';
 
 export const register = async (req: Request, res: Response) => {
     const dto: RegisterDto = req.body;
@@ -33,15 +34,17 @@ export const register = async (req: Request, res: Response) => {
     const token = generateToken();
     const tokenExpiry = new Date(Date.now() + SESSION_LENGTH_MS);
 
-    await prisma.session.create({
+    const hashedToken = await hash(token);
+
+    const session = await prisma.session.create({
         data: {
             userId: user.id,
-            token,
+            token: hashedToken,
             expiresAt: tokenExpiry,
         },
     });
 
-    res.cookie(COOKIE_NAME, token, {
+    res.cookie(COOKIE_NAME, serializeSession(session, token), {
         expires: tokenExpiry,
         httpOnly: true,
     });
