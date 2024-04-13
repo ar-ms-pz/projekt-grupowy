@@ -5,7 +5,7 @@ import { User } from '../../../../models/user';
 import { GetUserParams } from './params';
 
 export const getUser = errorCatcher(async (req: Request, res: Response) => {
-    const { userId } = req.body as GetUserParams;
+    const { userId } = req.params as unknown as GetUserParams;
 
     const user = await prisma.user.findFirst({
         where: {
