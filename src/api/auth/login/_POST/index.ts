@@ -19,9 +19,11 @@ export const login = errorCatcher(async (req: Request, res: Response) => {
 
     if (!user) {
         res.status(401).json({
-            error: 'Invalid credentials',
-            code: 'invalid_credentials',
-            path: [],
+            errors: {
+                error: 'Invalid credentials',
+                code: 'invalid_credentials',
+                path: [],
+            },
         });
 
         return;
@@ -31,9 +33,11 @@ export const login = errorCatcher(async (req: Request, res: Response) => {
 
     if (!validPassword) {
         res.status(401).json({
-            error: 'Invalid credentials',
-            code: 'invalid_credentials',
-            path: [],
+            errors: {
+                error: 'Invalid credentials',
+                code: 'invalid_credentials',
+                path: [],
+            },
         });
 
         return;

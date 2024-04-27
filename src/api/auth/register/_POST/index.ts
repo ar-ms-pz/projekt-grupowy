@@ -23,9 +23,11 @@ export const register = async (req: Request, res: Response) => {
         });
     } catch (error) {
         res.status(400).json({
-            error: 'Username already taken',
-            code: 'username_taken',
-            path: ['username'],
+            errors: {
+                error: 'Username already taken',
+                code: 'username_taken',
+                path: ['username'],
+            },
         });
 
         return;
