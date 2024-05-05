@@ -2,7 +2,11 @@ import { Session, User as PrismaUser } from '@prisma/client';
 import { Request, Response } from 'express';
 import { prisma } from '../../../../db/prisma';
 import { generateToken } from '../../../../auth/generateToken';
-import { COOKIE_NAME, SESSION_LENGTH_MS } from '../../../../config';
+import {
+    COOKIE_DOMAIN,
+    COOKIE_NAME,
+    SESSION_LENGTH_MS,
+} from '../../../../config';
 import { errorCatcher } from '../../../../middlewares/error-catcher';
 import { User } from '../../../../models/user';
 import { serializeSession } from '../../../../auth/serialize-session';
@@ -30,6 +34,9 @@ export const extendSession = errorCatcher(
         res.cookie(COOKIE_NAME, serializeSession(session, token), {
             expires: tokenExpiry,
             httpOnly: true,
+            sameSite: 'none',
+            secure: true,
+            domain: COOKIE_DOMAIN,
         });
 
         const user = User.fromPrisma(req.user as PrismaUser);

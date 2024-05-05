@@ -3,7 +3,11 @@ import { RegisterDto } from './dto';
 import { prisma } from '../../../../db/prisma';
 import { hash } from 'argon2';
 import { generateToken } from '../../../../auth/generateToken';
-import { COOKIE_NAME, SESSION_LENGTH_MS } from '../../../../config';
+import {
+    COOKIE_DOMAIN,
+    COOKIE_NAME,
+    SESSION_LENGTH_MS,
+} from '../../../../config';
 import { User } from '../../../../models/user';
 import { serializeSession } from '../../../../auth/serialize-session';
 
@@ -23,11 +27,13 @@ export const register = async (req: Request, res: Response) => {
         });
     } catch (error) {
         res.status(400).json({
-            errors: {
-                error: 'Username already taken',
-                code: 'username_taken',
-                path: ['username'],
-            },
+            errors: [
+                {
+                    error: 'Username already taken',
+                    code: 'username_taken',
+                    path: ['username'],
+                },
+            ],
         });
 
         return;
@@ -49,6 +55,9 @@ export const register = async (req: Request, res: Response) => {
     res.cookie(COOKIE_NAME, serializeSession(session, token), {
         expires: tokenExpiry,
         httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+        domain: COOKIE_DOMAIN,
     });
 
     const serializedUser = User.fromPrisma(user);

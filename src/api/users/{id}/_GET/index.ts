@@ -15,11 +15,13 @@ export const getUser = errorCatcher(async (req: Request, res: Response) => {
 
     if (!user) {
         res.status(404).json({
-            errors: {
-                error: 'User not found',
-                code: 'user_not_found',
-                path: ['userId'],
-            },
+            errors: [
+                {
+                    error: 'User not found',
+                    code: 'user_not_found',
+                    path: ['userId'],
+                },
+            ],
         });
 
         return;
