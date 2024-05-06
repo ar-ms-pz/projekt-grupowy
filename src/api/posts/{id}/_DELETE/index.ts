@@ -28,12 +28,13 @@ export const deletePost = errorCatcher(async (req: Request, res: Response) => {
         });
     }
 
-    rmSync(post.image);
     await prisma.post.delete({
         where: {
             id: postId,
         },
     });
+
+    rmSync(post.image);
 
     res.status(200).json({
         data: null,
