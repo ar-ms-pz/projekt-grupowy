@@ -1,50 +1,52 @@
 import { Post as PrismaPost, User as PrismaUser } from '@prisma/client';
 import { User } from './user';
+import { PostWithCoordinates } from '../db/post-with-coordinates';
+import { Image } from './image';
 
 export class Post {
     public id: number;
-    public image: string;
-    public description: string | null;
+    public images: Image[];
+    public description: string;
     public createdAt: Date;
     public updatedAt: Date;
-    public author: User | null;
-    public likes: number;
-    public isLiked: boolean | null;
+    public author: User;
+    public favorites: number;
+    public isFavorite: boolean | null;
 
     constructor(
         id: number,
-        image: string,
+        images: Image[],
+        description: string,
         createdAt: Date,
         updatedAt: Date,
-        likes: number,
-        isLiked: boolean | null,
-        description: string | null,
-        author: User | null,
+        favorites: number,
+        isFavorite: boolean | null,
+        author: User,
     ) {
         this.id = id;
-        this.image = image;
+        this.images = images;
         this.description = description;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.author = author;
-        this.likes = likes;
-        this.isLiked = isLiked;
+        this.favorites = favorites;
+        this.isFavorite = isFavorite;
     }
 
     public static fromPrisma(
-        post: PrismaPost,
+        { id, createdAt, description, images, updatedAt }: PostWithCoordinates,
         author: PrismaUser,
-        likes: number,
-        isLiked: boolean | null = null,
+        favorites: number,
+        isFavorite: boolean | null = null,
     ): Post {
         return new Post(
-            post.id,
-            post.image,
-            post.createdAt,
-            post.updatedAt,
-            likes,
-            isLiked,
-            post.description,
+            id,
+            images.map((image) => Image.fromPrisma(image)),
+            description,
+            createdAt,
+            updatedAt,
+            favorites,
+            isFavorite,
             User.fromPrisma(author),
         );
     }

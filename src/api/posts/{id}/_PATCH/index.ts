@@ -39,7 +39,7 @@ export const editPost = errorCatcher(async (req: Request, res: Response) => {
         },
         include: {
             author: true,
-            likes: {
+            favorites: {
                 where: {
                     userId,
                 },
@@ -47,17 +47,17 @@ export const editPost = errorCatcher(async (req: Request, res: Response) => {
         },
     });
 
-    const likesCount = await prisma.like.count({
+    const likesCount = await prisma.favorite.count({
         where: {
             postId,
         },
     });
 
     const serializedPost = Post.fromPrisma(
-        updatedPost,
+        updatedPost as any, // TODO
         updatedPost.author,
         likesCount,
-        updatedPost.likes.length > 0,
+        updatedPost.favorites.length > 0,
     );
 
     res.status(200).json({

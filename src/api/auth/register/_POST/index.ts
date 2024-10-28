@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { RegisterDto } from './dto';
 import { prisma } from '../../../../db/prisma';
 import { hash } from 'argon2';
-import { generateToken } from '../../../../auth/generateToken';
+import { generateToken } from '../../../../auth/generate-token';
 import {
     COOKIE_DOMAIN,
     COOKIE_NAME,

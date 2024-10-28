@@ -24,7 +24,7 @@ export const getPosts = errorCatcher(async (req: Request, res: Response) => {
         take: limit,
         include: {
             author: true,
-            likes: {
+            favorites: {
                 where: {
                     userId: req.user?.id,
                 },
@@ -32,7 +32,7 @@ export const getPosts = errorCatcher(async (req: Request, res: Response) => {
         },
     });
 
-    const likes = await prisma.like.groupBy({
+    const likes = await prisma.favorite.groupBy({
         by: ['postId'],
         _count: {
             postId: true,
@@ -48,10 +48,10 @@ export const getPosts = errorCatcher(async (req: Request, res: Response) => {
         const like = likes.find((like) => like.postId === post.id);
 
         return Post.fromPrisma(
-            post,
+            post as any, // TODO
             post.author,
             like?._count.postId || 0,
-            req.user?.id ? post.likes.length > 0 : null,
+            req.user?.id ? post.favorites.length > 0 : null,
         );
     });
 

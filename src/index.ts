@@ -34,6 +34,7 @@ import { getUser } from './api/users/{id}/_GET';
 import { whoAmI } from './api/who-am-i/_GET';
 import { requestLogger } from './middlewares/request-logger';
 import { cors } from './middlewares/cors';
+import { multiImage } from './middlewares/multi-image';
 
 const app: Express = express();
 
@@ -47,8 +48,8 @@ app.get('/posts', auth(false), query(getPostsQuerySchema), getPosts);
 app.post(
     '/posts',
     auth(),
-    singleImage,
-    dto(createPostDtoSchema, true),
+    multiImage,
+    dto(createPostDtoSchema, 'none'),
     createPost,
 );
 

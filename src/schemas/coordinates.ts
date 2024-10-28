@@ -1,12 +1,8 @@
 import { z } from 'zod';
-import { coordinates } from '../../../schemas/coordinates';
 
-export const createPostDtoSchema = z.object({
-    description: z.string().max(2048, {
-        message: 'Description can be at most 2048 characters long.',
-    }),
+export const coordinates = z.object({
     latitude: z
-        .number({ coerce: true })
+        .number()
         .max(90, {
             message: 'Latitude must be between -90 and 90.',
         })
@@ -14,7 +10,7 @@ export const createPostDtoSchema = z.object({
             message: 'Latitude must be between -90 and 90.',
         }),
     longitude: z
-        .number({ coerce: true })
+        .number()
         .max(180, {
             message: 'Longitude must be between -180 and 180.',
         })
@@ -23,4 +19,4 @@ export const createPostDtoSchema = z.object({
         }),
 });
 
-export type CreatePostDto = z.infer<typeof createPostDtoSchema>;
+export type Coordinates = z.infer<typeof coordinates>;
