@@ -7,9 +7,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum PostType {
+  RENTAL
+  SALE
+}
+
 model Post {
   id          Int      @id @default(autoincrement())
-  description String  @db.VarChar(2048)
+  title       String   @db.VarChar(128)
+  description String   @db.VarChar(2048)
+  price       Float
+  status      PostStatus  @default(DRAFT)
+  type        PostType
+  area        Float
+  rooms       Int
+  address     String  @db.VarChar(255)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   authorId    Int
