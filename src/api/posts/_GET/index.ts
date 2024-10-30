@@ -45,7 +45,7 @@ interface PostReturnType {
 export const getPosts = errorCatcher(async (req: Request, res: Response) => {
     const dto = req.query as unknown as GetPostsQuery;
     const { limit, offset } = dto;
-    const currentUserId = req.user!.id;
+    const currentUserId = req.user?.id;
 
     const [countQuery, countParams] = buildDbQuery(
         dto,

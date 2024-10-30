@@ -35,14 +35,14 @@ export const buildDbQuery = (
         type,
         userId,
     }: GetPostsQuery,
-    currentUserId: number,
+    currentUserId?: number,
     count = false,
     status?: string,
-): [string, (string | number)[]] => {
+): [string, (string | number | undefined)[]] => {
     const baseQuery = count ? BASE_COUNT_QUERY : BASE_DATA_QUERY;
 
     let conditions = [];
-    let params: (string | number)[] = !count ? [currentUserId] : []; // First parameter for favorites.userId
+    let params: (string | number | undefined)[] = !count ? [currentUserId] : []; // First parameter for favorites.userId
 
     if (userId) {
         conditions.push(`p."authorId" = $${params.length + 1}`);
