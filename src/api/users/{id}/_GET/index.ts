@@ -6,6 +6,7 @@ import { GetUserParams } from './params';
 
 export const getUser = errorCatcher(async (req: Request, res: Response) => {
     const { userId } = req.params as unknown as GetUserParams;
+    const currentUserType = req.user?.type;
 
     const user = await prisma.user.findFirst({
         where: {
@@ -27,7 +28,7 @@ export const getUser = errorCatcher(async (req: Request, res: Response) => {
         return;
     }
 
-    const serializedUser = User.fromPrisma(user);
+    const serializedUser = User.fromPrisma(user, currentUserType !== 'ADMIN');
 
     res.status(200).json({ data: serializedUser });
 });

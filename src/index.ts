@@ -5,7 +5,6 @@ import { getPost } from './api/posts/{id}/_GET';
 import { deletePost } from './api/posts/{id}/_DELETE';
 import { editPost } from './api/posts/{id}/_PATCH';
 import { createPostDtoSchema } from './api/posts/_POST/dto';
-import { singleImage } from './middlewares/single-image';
 import { dto } from './middlewares/dto';
 import { query } from './middlewares/query';
 import { getPostsQuerySchema } from './api/posts/_GET/query';
@@ -35,6 +34,15 @@ import { whoAmI } from './api/who-am-i/_GET';
 import { requestLogger } from './middlewares/request-logger';
 import { cors } from './middlewares/cors';
 import { multiImage } from './middlewares/multi-image';
+import { getUsersQuerySchema } from './api/users/_GET/query';
+import { getUsers } from './api/users/_GET';
+import { editUserDtoSchema } from './api/users/{id}/_PATCH/dto';
+import { editUserParamsSchema } from './api/users/{id}/_PATCH/params';
+import { createUser } from './api/users/_POST';
+import { createUserDtoSchema } from './api/users/_POST/dto';
+import { editUser } from './api/users/{id}/_PATCH';
+import { deleteUserParamsSchema } from './api/users/{id}/_DELETE/params';
+import { deleteUser } from './api/users/{id}/_DELETE';
 
 const app: Express = express();
 
@@ -77,7 +85,23 @@ app.post('/auth/logout', auth(), logout);
 app.post('/auth/extend-session', auth(), extendSession);
 
 app.get('/who-am-i', auth(), whoAmI);
+
+app.get('/users', auth(), query(getUsersQuerySchema), getUsers);
+app.post('/users', auth(), dto(createUserDtoSchema), createUser);
 app.get('/users/:userId', auth(false), params(getUserParamsSchema), getUser);
+app.patch(
+    '/users/:userId',
+    auth(),
+    params(editUserParamsSchema),
+    dto(editUserDtoSchema),
+    editUser,
+);
+app.delete(
+    '/users/:userId',
+    auth(),
+    params(deleteUserParamsSchema),
+    deleteUser,
+);
 
 app.use(errorHandler);
 

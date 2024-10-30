@@ -18,6 +18,11 @@ enum PostType {
   SALE
 }
 
+enum UserType {
+  USER
+  ADMIN
+}
+
 model Post {
   id          Int      @id @default(autoincrement())
   title       String   @db.VarChar(128)
@@ -46,6 +51,7 @@ model User {
   password  String    @db.VarChar(255)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  type      UserType  @default(USER)
   favorites   Favorite[]
   posts     Post[]
   sessions  Session[]
