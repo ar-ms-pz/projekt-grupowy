@@ -3,11 +3,9 @@ import { GetPostsQuery } from './query';
 const BASE_DATA_QUERY = `
     SELECT 
     p."id", p."title", p."description", p."price", p."status"::text, p."type"::text, p."area", p."rooms", p."address", p."createdAt", p."updatedAt", p."authorId", ST_X(p.coordinates) as longitude,  ST_Y(p.coordinates) as latitude,
-    i."id" as "imageId", i."name" as "imageName", i."postId" as "imagePostId", i."createdAt" as "imageCreatedAt", i."updatedAt" as "imageUpdatedAt",
     u."id" as "authorId", u."name" as "authorName", u."createdAt" as "authorCreatedAt", u."updatedAt" as "authorUpdatedAt",
     f."id" as "favoriteId"
     FROM "Post" p
-    LEFT JOIN "Image" i ON i."postId" = p.id
     LEFT JOIN "User" u ON u.id = p."authorId"
     LEFT JOIN "Favorite" f ON f."postId" = p.id AND f."userId" = $1
     WHERE 1=1`;
@@ -42,7 +40,7 @@ export const buildDbQuery = (
     const baseQuery = count ? BASE_COUNT_QUERY : BASE_DATA_QUERY;
 
     let conditions = [];
-    let params: (string | number | undefined)[] = !count ? [currentUserId] : []; // First parameter for favorites.userId
+    let params: (string | number | undefined)[] = count ? [] : [currentUserId]; // First parameter for favorites.userId
 
     if (userId) {
         conditions.push(`p."authorId" = $${params.length + 1}`);
@@ -111,7 +109,6 @@ export const buildDbQuery = (
 `;
 
     if (!count) params.push(offset, limit);
-    console.log(finalQuery, params);
 
     return [finalQuery, params];
 };
