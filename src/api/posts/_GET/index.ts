@@ -41,6 +41,14 @@ export const getPosts = errorCatcher(async (req: Request, res: Response) => {
     const { limit, offset } = query;
     const currentUserId = req.user?.id;
 
+    if (query.isFavorite && !currentUserId) {
+        res.status(403).json({
+            error: 'Unauthorized',
+            message: 'You need to be logged in to see your favorites',
+        });
+        return;
+    }
+
     const [countQuery, countParams] = buildDbQuery(
         query,
         currentUserId,

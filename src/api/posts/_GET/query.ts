@@ -3,6 +3,12 @@ import { z } from 'zod';
 
 export const getPostsQuerySchema = z
     .object({
+        isFavorite: z
+            .boolean({
+                invalid_type_error: 'isFavorite must be a boolean',
+                coerce: true,
+            })
+            .optional(),
         limit: z
             .number({
                 invalid_type_error: 'Limit must be a number',

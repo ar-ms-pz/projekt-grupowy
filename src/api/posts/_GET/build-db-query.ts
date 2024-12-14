@@ -7,13 +7,12 @@ const BASE_DATA_QUERY = `
     f."id" as "favoriteId"
     FROM "Post" p
     LEFT JOIN "User" u ON u.id = p."authorId"
-    LEFT JOIN "Favorite" f ON f."postId" = p.id AND f."userId" = $1
-    WHERE 1=1`;
+`;
 
 const BASE_COUNT_QUERY = `
     SELECT COUNT(*) as "postCount"
     FROM "Post" p
-    WHERE 1=1`;
+`;
 
 export const buildDbQuery = (
     {
@@ -32,15 +31,28 @@ export const buildDbQuery = (
         title,
         type,
         userId,
+        isFavorite,
     }: GetPostsQuery,
     currentUserId?: number,
     count = false,
     status?: string,
 ): [string, (string | number | undefined)[]] => {
-    const baseQuery = count ? BASE_COUNT_QUERY : BASE_DATA_QUERY;
+    let baseQuery = count ? BASE_COUNT_QUERY : BASE_DATA_QUERY;
 
     let conditions = [];
-    let params: (string | number | undefined)[] = count ? [] : [currentUserId]; // First parameter for favorites.userId
+    let params: (string | number | undefined)[] = [];
+
+    if (currentUserId) {
+        baseQuery += `LEFT JOIN "Favorite" f ON f."postId" = p.id AND f."userId" = $1\n`;
+        params.push(currentUserId);
+    }
+
+    baseQuery += `WHERE 1=1\n`;
+
+    if (isFavorite && currentUserId) {
+        conditions.push(`f."userId" = $${params.length + 1}`);
+        params.push(currentUserId);
+    }
 
     if (userId) {
         conditions.push(`p."authorId" = $${params.length + 1}`);
