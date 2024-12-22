@@ -35,13 +35,25 @@ export const getPost = errorCatcher(async (req: Request, res: Response) => {
         });
     }
 
+    if (post.status === 'DRAFT' && post.authorId !== req.user?.id) {
+        return res.status(403).json({
+            errors: [
+                {
+                    message: 'Unauthorized',
+                    path: ['postId'],
+                    code: 'unauthorized',
+                },
+            ],
+        });
+    }
+
     const coordinates = await prisma.$queryRaw<
         (Coordinates & { postId: number })[]
     >`
     SELECT
     p.id as "postId",
-    ST_X(p.coordinates) as longitude,
-    ST_Y(p.coordinates) as latitude
+    ST_X(p.coordinates) as latitude,
+    ST_Y(p.coordinates) as longitude
     FROM "Post" p
     WHERE p.id = ${post.id}
     `;

@@ -8,13 +8,14 @@ import { prisma } from '../../../../db/prisma';
 import { EditUserParams } from './params';
 
 export const editUser = errorCatcher(async (req: Request, res: Response) => {
-    const { password, type } = req.body as unknown as EditUserDto;
+    const { password, type, phone, email } = req.body as unknown as EditUserDto;
     const currentUserType = req.user!.type;
+    const currentUserId = req.user!.id;
     const { userId } = req.params as unknown as EditUserParams;
 
-    if (currentUserType !== UserType.ADMIN)
+    if (currentUserType !== UserType.ADMIN && currentUserId !== userId)
         return res.status(403).json({
-            message: `Role '${UserType.ADMIN}' is required to edit users`,
+            message: `Role '${UserType.ADMIN}' is required to edit other users`,
         });
 
     const hashedPassword = password ? await hash(password) : undefined;
@@ -25,6 +26,8 @@ export const editUser = errorCatcher(async (req: Request, res: Response) => {
         },
         data: {
             password: hashedPassword,
+            phone,
+            email,
             type,
         },
     });

@@ -15,6 +15,19 @@ export const editUserDtoSchema = z.object({
         })
         .optional(),
     type: z.enum([UserType.ADMIN, UserType.USER]).optional(),
+
+    email: z
+        .string()
+        .email({
+            message: 'Email must be a valid email address.',
+        })
+        .optional(),
+    phone: z
+        .string()
+        .regex(/^[+]?[0-9]{0,3}[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/, {
+            message: 'Phone number must be a valid phone number.',
+        })
+        .optional(),
 });
 
 export type EditUserDto = z.infer<typeof editUserDtoSchema>;

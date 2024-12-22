@@ -1,4 +1,4 @@
-import { PostType } from '@prisma/client';
+import { PostStatus, PostType } from '@prisma/client';
 import { z } from 'zod';
 
 export const getPostsQuerySchema = z
@@ -141,6 +141,27 @@ export const getPostsQuerySchema = z
             .int('Rooms must be a positive integer.')
             .positive('Rooms must be a positive integer.')
             .optional(),
+        status: z.preprocess(
+            (string) => {
+                if (!string || typeof string !== 'string') return undefined;
+
+                return string.split(',');
+            },
+            z
+                .array(
+                    z.enum(
+                        [
+                            PostStatus.DRAFT,
+                            PostStatus.PUBLISHED,
+                            PostStatus.ARCHIVED,
+                        ],
+                        {
+                            invalid_type_error: `Status must be one of "${PostStatus.DRAFT}", "${PostStatus.PUBLISHED}", or "${PostStatus.ARCHIVED}".`,
+                        },
+                    ),
+                )
+                .default([PostStatus.PUBLISHED]),
+        ),
     })
     .refine(
         (data) => {
