@@ -23,6 +23,8 @@ export const register = async (req: Request, res: Response) => {
             data: {
                 name: dto.username,
                 password: hashedPassword,
+                email: dto.email,
+                phone: dto.phone,
             },
         });
     } catch (error) {

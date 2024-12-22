@@ -24,6 +24,12 @@ export const registerDtoSchema = z.object({
         .regex(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).+$/, {
             message: `Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character from the following: #?!@$ %^&*-`,
         }),
+    email: z.string().email({
+        message: 'Email must be a valid email address.',
+    }),
+    phone: z.string().regex(/^[+]?[0-9]{0,3}[(]?[0-9]{1,4}[)]?[-\s./0-9]*$/, {
+        message: 'Phone number must be a valid phone number.',
+    }),
 });
 
 export type RegisterDto = z.infer<typeof registerDtoSchema>;
