@@ -18,6 +18,17 @@ export const editUser = errorCatcher(async (req: Request, res: Response) => {
             message: `Role '${UserType.ADMIN}' is required to edit other users`,
         });
 
+    const editedUser = await prisma.user.findFirst({
+        where: {
+            id: userId,
+        },
+    });
+
+    if (currentUserType !== UserType.ADMIN && type !== editedUser?.type)
+        return res.status(403).json({
+            message: `Role '${UserType.ADMIN}' is required to change user role`,
+        });
+
     const hashedPassword = password ? await hash(password) : undefined;
 
     const user = await prisma.user.update({

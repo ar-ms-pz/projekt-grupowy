@@ -1,5 +1,5 @@
 {
-    "name": "platformy-technologiczne",
+    "name": "nieruchomex",
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
@@ -16,6 +16,7 @@
     "license": "ISC",
     "dependencies": {
         "@prisma/client": "^5.11.0",
+        "@radix-ui/react-tooltip": "^1.1.6",
         "@types/cookie-parser": "^1.4.7",
         "argon2": "^0.40.1",
         "cookie-parser": "^1.4.6",

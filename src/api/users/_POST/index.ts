@@ -7,7 +7,8 @@ import { UserType } from '@prisma/client';
 import { hash } from 'argon2';
 
 export const createUser = errorCatcher(async (req: Request, res: Response) => {
-    const { name, password, type } = req.body as unknown as CreateUserDto;
+    const { name, password, type, email, phone } =
+        req.body as unknown as CreateUserDto;
     const currentUserType = req.user!.type;
 
     if (currentUserType !== UserType.ADMIN)
@@ -39,6 +40,8 @@ export const createUser = errorCatcher(async (req: Request, res: Response) => {
             name,
             password: hashedPassword,
             type,
+            email,
+            phone,
         },
     });
 

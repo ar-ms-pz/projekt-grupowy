@@ -15,7 +15,6 @@ export const editUserDtoSchema = z.object({
         })
         .optional(),
     type: z.enum([UserType.ADMIN, UserType.USER]).optional(),
-
     email: z
         .string()
         .email({
