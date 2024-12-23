@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { coordinates } from '../../../schemas/coordinates';
 import { PostStatus, PostType } from '@prisma/client';
 
 export const createPostDtoSchema = z.object({
