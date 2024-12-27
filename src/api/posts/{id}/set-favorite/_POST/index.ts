@@ -4,11 +4,10 @@ import { SetLikeParams } from './params';
 import { prisma } from '../../../../../db/prisma';
 import { User } from '@prisma/client';
 import { Favorite } from '../../../../../models/favorite';
-import { SetLikeDto } from './dto';
 
 export const setFavorite = errorCatcher(async (req: Request, res: Response) => {
     const { postId } = req.params as unknown as SetLikeParams;
-    const { favorite: setFavorite } = req.body as SetLikeDto;
+    const { like: setLike } = req.body as { like: boolean };
     const { id: userId } = req.user as User;
 
     const post = await prisma.post.findFirst({
@@ -35,7 +34,7 @@ export const setFavorite = errorCatcher(async (req: Request, res: Response) => {
         },
     });
 
-    if (setFavorite) {
+    if (setLike) {
         if (favorite) {
             const serializedLike = Favorite.fromPrisma(favorite);
 
@@ -49,9 +48,9 @@ export const setFavorite = errorCatcher(async (req: Request, res: Response) => {
             },
         });
 
-        const serializedFavorite = Favorite.fromPrisma(createdFavorite);
+        const serializedLike = Favorite.fromPrisma(createdFavorite);
 
-        return res.status(201).json({ data: serializedFavorite });
+        return res.status(201).json({ data: serializedLike });
     }
 
     if (!favorite) {

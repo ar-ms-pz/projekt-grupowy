@@ -53,14 +53,14 @@ export const createPost = errorCatcher(async (req: Request, res: Response) => {
 
         await prisma.$executeRaw`
     UPDATE "Post"
-    SET coordinates = ST_SetSRID(ST_MakePoint(${latitude}, ${longitude}), 4326)
+    SET coordinates = ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)
     WHERE id = ${post.id}
     `;
 
         const coordinates: Coordinates[] = await prisma.$queryRaw`
         SELECT
-        ST_X(p.coordinates) as latitude,
-        ST_Y(p.coordinates) as longitude
+        ST_X(p.coordinates) as longitude,
+        ST_Y(p.coordinates) as latitude
         FROM "Post" p
         WHERE p.id = ${post.id}
     `;

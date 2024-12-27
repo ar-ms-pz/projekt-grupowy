@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const setLikeDtoSchema = z.object({
-    favorite: z.boolean(),
+    like: z.boolean(),
 });
 
 export type SetLikeDto = z.infer<typeof setLikeDtoSchema>;
