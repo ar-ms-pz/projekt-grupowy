@@ -6,8 +6,8 @@ export const createPostDtoSchema = z.object({
         .string({
             required_error: 'Description is required.',
         })
-        .max(2048, {
-            message: 'Description can be at most 2048 characters long.',
+        .max(32384, {
+            message: 'Description can be at most 32384 characters long.',
         }),
     title: z
         .string({

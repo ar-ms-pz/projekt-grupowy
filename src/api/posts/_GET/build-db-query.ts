@@ -1,10 +1,12 @@
 import { GetPostsQuery } from './query';
 
-const BASE_DATA_QUERY = `
+const BASE_DATA_QUERY = (includeFavorite = false) =>
+    `
     SELECT 
     p."id", p."title", p."description", p."price", p."status"::text, p."type"::text, p."area", p."rooms", p."address", p."createdAt", p."updatedAt", p."authorId", ST_X(p.coordinates) as latitude,  ST_Y(p.coordinates) as longitude,
-    u."id" as "authorId", u."name" as "authorName", u."createdAt" as "authorCreatedAt", u."updatedAt" as "authorUpdatedAt",
-    f."id" as "favoriteId"
+    u."id" as "authorId", u."name" as "authorName", u."createdAt" as "authorCreatedAt", u."updatedAt" as "authorUpdatedAt"` +
+    (includeFavorite ? ', f."id" as "favoriteId"\n' : '') +
+    `
     FROM "Post" p
     LEFT JOIN "User" u ON u.id = p."authorId"
 `;
@@ -32,12 +34,12 @@ export const buildDbQuery = (
         type,
         userId,
         isFavorite,
+        status,
     }: GetPostsQuery,
     currentUserId?: number,
     count = false,
-    status?: string,
 ): [string, (string | number | undefined)[]] => {
-    let baseQuery = count ? BASE_COUNT_QUERY : BASE_DATA_QUERY;
+    let baseQuery = count ? BASE_COUNT_QUERY : BASE_DATA_QUERY(!!currentUserId);
 
     let conditions = [];
     let params: (string | number | undefined)[] = [];
@@ -103,8 +105,10 @@ export const buildDbQuery = (
     }
 
     if (status) {
-        conditions.push(`p.status = $${params.length + 1}::"PostStatus"`);
-        params.push(status);
+        conditions.push(
+            `p.status = ANY($${params.length + 1}::"PostStatus"[])`,
+        );
+        params.push(status as any);
     }
 
     const finalQuery = `${baseQuery}
@@ -122,7 +126,7 @@ export const buildDbQuery = (
 
     if (!count) params.push(offset, limit);
 
-    console.log(params);
+    console.log(params, finalQuery);
 
     return [finalQuery, params];
 };

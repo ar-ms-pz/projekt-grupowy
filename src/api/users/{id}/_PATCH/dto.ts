@@ -15,7 +15,6 @@ export const editUserDtoSchema = z.object({
         })
         .optional(),
     type: z.enum([UserType.ADMIN, UserType.USER]).optional(),
-<<<<<<< HEAD
     email: z
         .string()
         .email({
@@ -28,8 +27,6 @@ export const editUserDtoSchema = z.object({
             message: 'Phone number must be a valid phone number.',
         })
         .optional(),
-=======
->>>>>>> parent of cc50cf4 (Fix some stuff)
 });
 
 export type EditUserDto = z.infer<typeof editUserDtoSchema>;
