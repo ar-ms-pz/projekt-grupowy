@@ -5,7 +5,7 @@ import { prisma } from '../../../../../db/prisma';
 import { User } from '@prisma/client';
 import { Favorite } from '../../../../../models/favorite';
 
-export const setLike = errorCatcher(async (req: Request, res: Response) => {
+export const setFavorite = errorCatcher(async (req: Request, res: Response) => {
     const { postId } = req.params as unknown as SetLikeParams;
     const { like: setLike } = req.body as { like: boolean };
     const { id: userId } = req.user as User;
@@ -27,7 +27,7 @@ export const setLike = errorCatcher(async (req: Request, res: Response) => {
             ],
         });
 
-    const like = await prisma.favorite.findFirst({
+    const favorite = await prisma.favorite.findFirst({
         where: {
             postId,
             userId,
@@ -35,31 +35,31 @@ export const setLike = errorCatcher(async (req: Request, res: Response) => {
     });
 
     if (setLike) {
-        if (like) {
-            const serializedLike = Favorite.fromPrisma(like);
+        if (favorite) {
+            const serializedLike = Favorite.fromPrisma(favorite);
 
             return res.status(200).json({ data: serializedLike });
         }
 
-        const createdLike = await prisma.favorite.create({
+        const createdFavorite = await prisma.favorite.create({
             data: {
                 postId,
                 userId,
             },
         });
 
-        const serializedLike = Favorite.fromPrisma(createdLike);
+        const serializedLike = Favorite.fromPrisma(createdFavorite);
 
         return res.status(201).json({ data: serializedLike });
     }
 
-    if (!like) {
+    if (!favorite) {
         return res.status(200).json({ data: null });
     }
 
     await prisma.favorite.delete({
         where: {
-            id: like.id,
+            id: favorite.id,
         },
     });
 

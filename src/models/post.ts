@@ -12,6 +12,14 @@ export class Post {
     public author: User;
     public favorites: number;
     public isFavorite: boolean | null;
+    public latitude: number | null;
+    public longitude: number | null;
+    public address: string;
+    public area: number;
+    public price: number;
+    public rooms: number;
+    public status: string;
+    public type: string;
 
     constructor(
         id: number,
@@ -22,6 +30,14 @@ export class Post {
         favorites: number,
         isFavorite: boolean | null,
         author: User,
+        latitude: number | null,
+        longitude: number | null,
+        address: string,
+        area: number,
+        price: number,
+        rooms: number,
+        status: string,
+        type: string,
     ) {
         this.id = id;
         this.images = images;
@@ -31,10 +47,32 @@ export class Post {
         this.author = author;
         this.favorites = favorites;
         this.isFavorite = isFavorite;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.address = address;
+        this.area = area;
+        this.price = price;
+        this.rooms = rooms;
+        this.status = status;
+        this.type = type;
     }
 
     public static fromPrisma(
-        { id, createdAt, description, images, updatedAt }: PostWithCoordinates,
+        {
+            id,
+            createdAt,
+            description,
+            images,
+            updatedAt,
+            latitude,
+            longitude,
+            address,
+            area,
+            price,
+            rooms,
+            status,
+            type,
+        }: PostWithCoordinates,
         author: PrismaUser,
         favorites: number,
         isFavorite: boolean | null = null,
@@ -48,6 +86,14 @@ export class Post {
             favorites,
             isFavorite,
             User.fromPrisma(author),
+            latitude,
+            longitude,
+            address,
+            area,
+            price,
+            rooms,
+            status,
+            type,
         );
     }
 }
