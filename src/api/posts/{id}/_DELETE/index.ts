@@ -14,9 +14,6 @@ export const deletePost = errorCatcher(async (req: Request, res: Response) => {
             id: postId,
             authorId: userId,
         },
-        include: {
-            images: true,
-        },
     });
 
     if (!post) {
@@ -37,11 +34,8 @@ export const deletePost = errorCatcher(async (req: Request, res: Response) => {
         },
     });
 
-    post.images.forEach((image) => {
-        try {
-            rmSync(`images/${image.name}`);
-        } catch (error) {}
-    });
+    // TODO
+    // rmSync(post.images);
 
     res.status(200).json({
         data: null,

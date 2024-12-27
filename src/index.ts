@@ -25,9 +25,9 @@ import { extendSession } from './api/auth/extend-session/_POST';
 import { logout } from './api/auth/logout/_POST';
 import { errorHandler } from './middlewares/error-handler';
 import cookieParser from 'cookie-parser';
-import { setLikeDtoSchema } from './api/posts/{id}/set-favorite/_POST/dto';
-import { setLikeParamsSchema } from './api/posts/{id}/set-favorite/_POST/params';
-import { setFavorite } from './api/posts/{id}/set-favorite/_POST';
+import { setLikeDtoSchema } from './api/posts/{id}/set-like/_POST/dto';
+import { setLikeParamsSchema } from './api/posts/{id}/set-like/_POST/params';
+import { setLike } from './api/posts/{id}/set-like/_POST';
 import { getUserParamsSchema } from './api/users/{id}/_GET/params';
 import { getUser } from './api/users/{id}/_GET';
 import { whoAmI } from './api/who-am-i/_GET';
@@ -53,13 +53,18 @@ app.use(cookieParser());
 app.use('/images', express.static('images'));
 
 app.get('/posts', auth(false), query(getPostsQuerySchema), getPosts);
-app.post('/posts', auth(), multiImage, dto(createPostDtoSchema), createPost);
+app.post(
+    '/posts',
+    auth(),
+    multiImage,
+    dto(createPostDtoSchema, 'none'),
+    createPost,
+);
 
 app.get('/posts/:postId', auth(false), params(getPostParamsSchema), getPost);
 app.patch(
     '/posts/:postId',
     auth(),
-    multiImage,
     params(editPostParamsSchema),
     dto(editPostDtoSchema),
     editPost,
@@ -72,11 +77,11 @@ app.delete(
 );
 
 app.post(
-    '/posts/:postId/set-favorite',
+    '/posts/:postId/set-like',
     auth(),
     dto(setLikeDtoSchema),
     params(setLikeParamsSchema),
-    setFavorite,
+    setLike,
 );
 
 app.post('/auth/register', dto(registerDtoSchema), register);

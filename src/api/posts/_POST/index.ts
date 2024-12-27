@@ -5,85 +5,47 @@ import { User } from '@prisma/client';
 import { errorCatcher } from '../../../middlewares/error-catcher';
 import { Post } from '../../../models/post';
 import { PostWithCoordinates } from '../../../db/post-with-coordinates';
-import { Coordinates } from '../../../schemas/coordinates';
-import { rmSync } from 'fs';
 
 export const createPost = errorCatcher(async (req: Request, res: Response) => {
-    const {
-        description,
-        latitude,
-        longitude,
-        address,
-        area,
-        price,
-        rooms,
-        type,
-        status,
-        title,
-    }: CreatePostDto = req.body;
-    try {
-        const { id: userId } = req.user as User;
-        const images = (req.files || []) as Express.Multer.File[];
+    const { description, latitude, longitude }: CreatePostDto = req.body;
+    const { id: userId } = req.user as User;
+    const images = (req.files || []) as Express.Multer.File[];
 
-        const imageData = images.map((file) => ({
-            name: file.filename,
-        }));
+    // Transform images array to match Prisma's expected format for creating associated images
+    const imageData = images.map((file) => ({
+        name: file.filename, // Adjust according to your file storage logic
+    }));
 
-        const post = await prisma.post.create({
-            data: {
-                address,
-                area,
-                price,
-                rooms,
-                type,
-                status,
-                description,
-                title,
-                author: {
-                    connect: { id: userId },
-                },
-                images: {
-                    create: imageData,
-                },
+    const post = await prisma.post.create({
+        data: {
+            description,
+            author: {
+                connect: { id: userId },
             },
-            include: {
-                images: true,
+            images: {
+                create: imageData,
             },
-        });
+        },
+        include: {
+            images: true,
+        },
+    });
 
-        await prisma.$executeRaw`
+    const postWithCoords = (await prisma.$executeRaw`
     UPDATE "Post"
     SET coordinates = ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)
     WHERE id = ${post.id}
-    `;
+    RETURNING id, description, "createdAt", "updatedAt", "authorId",
+                      ST_Y(coordinates) AS latitude,
+                      ST_X(coordinates) AS longitude
+    `) as unknown as Omit<PostWithCoordinates, 'images'>[];
 
-        const coordinates: Coordinates[] = await prisma.$queryRaw`
-        SELECT
-        ST_X(p.coordinates) as longitude,
-        ST_Y(p.coordinates) as latitude
-        FROM "Post" p
-        WHERE p.id = ${post.id}
-    `;
+    const serializedPost = Post.fromPrisma(
+        { ...postWithCoords[0], images: post.images },
+        req.user as User,
+        0,
+        false,
+    );
 
-        const serializedPost = Post.fromPrisma(
-            {
-                latitude: coordinates[0]?.latitude ?? null,
-                longitude: coordinates[0]?.longitude ?? null,
-                ...post,
-            },
-            req.user as User,
-            0,
-            false,
-        );
-
-        res.status(201).json({ data: serializedPost });
-    } catch (error) {
-        if (req.files) {
-            (req.files as Express.Multer.File[]).forEach((file) => {
-                rmSync(file.path);
-            });
-        }
-
-        throw error;
-    }
+    res.status(201).json({ data: serializedPost });
 });
