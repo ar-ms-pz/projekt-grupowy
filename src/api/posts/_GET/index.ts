@@ -49,12 +49,22 @@ export const getPosts = errorCatcher(async (req: Request, res: Response) => {
         return;
     }
 
-    const [countQuery, countParams] = buildDbQuery(query, currentUserId, true);
+    const [countQuery, countParams] = buildDbQuery(
+        query,
+        currentUserId,
+        true,
+        'DRAFT',
+    );
 
     const [{ postCount }]: { postCount: BigInt }[] =
         await prisma.$queryRawUnsafe(countQuery, ...countParams);
 
-    const [postQuery, postParams] = buildDbQuery(query, currentUserId, false);
+    const [postQuery, postParams] = buildDbQuery(
+        query,
+        currentUserId,
+        false,
+        'DRAFT',
+    );
 
     const rawPosts: PostReturnType[] = await prisma.$queryRawUnsafe(
         postQuery,
