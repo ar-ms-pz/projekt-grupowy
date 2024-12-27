@@ -3,13 +3,7 @@ import { GetPostsQuery } from './query';
 import { prisma } from '../../../db/prisma';
 import { errorCatcher } from '../../../middlewares/error-catcher';
 import { Post } from '../../../models/post';
-import {
-    Image,
-    Prisma,
-    Post as PrismaPost,
-    User as PrismaUser,
-} from '@prisma/client';
-import { Coordinates } from '../../../schemas/coordinates';
+import { User as PrismaUser } from '@prisma/client';
 import { buildDbQuery } from './build-db-query';
 import { PostWithCoordinates } from '../../../db/post-with-coordinates';
 
@@ -43,8 +37,8 @@ interface PostReturnType {
  * BEWARE UGLY CODE AHEAD
  */
 export const getPosts = errorCatcher(async (req: Request, res: Response) => {
-    const dto = req.query as unknown as GetPostsQuery;
-    const { limit, offset } = dto;
+    const query = req.query as unknown as GetPostsQuery;
+    const { limit, offset } = query;
     const currentUserId = req.user?.id;
 
     if (query.isFavorite && !currentUserId) {
@@ -56,7 +50,7 @@ export const getPosts = errorCatcher(async (req: Request, res: Response) => {
     }
 
     const [countQuery, countParams] = buildDbQuery(
-        dto,
+        query,
         currentUserId,
         true,
         'DRAFT',
@@ -66,7 +60,7 @@ export const getPosts = errorCatcher(async (req: Request, res: Response) => {
         await prisma.$queryRawUnsafe(countQuery, ...countParams);
 
     const [postQuery, postParams] = buildDbQuery(
-        dto,
+        query,
         currentUserId,
         false,
         'DRAFT',
@@ -77,35 +71,26 @@ export const getPosts = errorCatcher(async (req: Request, res: Response) => {
         ...postParams,
     );
 
-    const groupedPosts = rawPosts.reduce(
-        (acc, post) => {
-            if (!acc[post.id]) {
-                acc[post.id] = {
-                    ...post,
-                    author: {
-                        id: post.authorId,
-                        name: post.authorName,
-                        createdAt: post.authorCreatedAt,
-                        updatedAt: post.authorUpdatedAt,
-                    },
-                    images: [] as Image[],
-                };
-            }
-
-            acc[post.id].images.push({
-                id: post.imageId,
-                name: post.imageName,
-                postId: post.imagePostId,
-                createdAt: post.imageCreatedAt,
-                updatedAt: post.imageUpdatedAt,
-            });
-
-            return acc;
+    const images = await prisma.image.findMany({
+        where: {
+            postId: {
+                in: rawPosts.map((post) => post.id),
+            },
         },
-        {} as Record<number, any>,
-    );
+    });
 
-    const posts = Object.values(groupedPosts);
+    const posts = rawPosts.map(({ status, type, ...post }) => ({
+        ...post,
+        status: status as PostWithCoordinates['status'],
+        type: type as PostWithCoordinates['type'],
+        author: {
+            id: post.authorId,
+            name: post.authorName,
+            createdAt: post.authorCreatedAt,
+            updatedAt: post.authorUpdatedAt,
+        },
+        images: images.filter((image) => image.postId === post.id),
+    }));
 
     const favorites = await prisma.favorite.groupBy({
         by: ['postId'],
@@ -126,7 +111,7 @@ export const getPosts = errorCatcher(async (req: Request, res: Response) => {
 
         return Post.fromPrisma(
             post,
-            post.author,
+            post.author as PrismaUser,
             favorite?._count.postId || 0,
             req.user?.id ? !!post.favoriteId : null,
         );

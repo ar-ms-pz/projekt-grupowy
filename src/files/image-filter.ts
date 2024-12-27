@@ -1,7 +1,7 @@
 import { Request } from 'express';
 import { FileFilterCallback } from 'multer';
 
-const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/gif'];
+const ALLOWED_MIME = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
 export const imageFilter = (
     _req: Request,

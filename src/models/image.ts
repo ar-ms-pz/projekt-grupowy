@@ -12,6 +12,8 @@ export class Image {
     }
 
     static fromPrisma({ id, name }: PrismaImage): Image {
+        console.log(name);
+
         return new Image(id, name, `/images/${name}`);
     }
 }

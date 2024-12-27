@@ -6,6 +6,7 @@ import { Image } from './image';
 export class Post {
     public id: number;
     public images: Image[];
+    public title: string;
     public description: string;
     public createdAt: Date;
     public updatedAt: Date;
@@ -24,6 +25,7 @@ export class Post {
     constructor(
         id: number,
         images: Image[],
+        title: string,
         description: string,
         createdAt: Date,
         updatedAt: Date,
@@ -41,6 +43,7 @@ export class Post {
     ) {
         this.id = id;
         this.images = images;
+        this.title = title;
         this.description = description;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -72,6 +75,7 @@ export class Post {
             rooms,
             status,
             type,
+            title,
         }: PostWithCoordinates,
         author: PrismaUser,
         favorites: number,
@@ -80,6 +84,7 @@ export class Post {
         return new Post(
             id,
             images.map((image) => Image.fromPrisma(image)),
+            title,
             description,
             createdAt,
             updatedAt,
