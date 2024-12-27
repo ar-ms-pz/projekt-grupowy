@@ -28,13 +28,17 @@ enum UserType {
 >>>>>>> parent of dd397bb (Make geo posts work)
 model Post {
   id          Int      @id @default(autoincrement())
-  image       String   @unique
-  description String?  @db.VarChar(255)
+  description String  @db.VarChar(2048)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   authorId    Int
   author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  likes        Like[]
+  favorites   Favorite[]
+
+  coordinates    Unsupported("geometry(Point, 4326)")?
+  @@index([coordinates], name: "location_idx", type: Gist)
+
+  images       Image[]
 }
 
 model User {
@@ -43,14 +47,10 @@ model User {
   password  String    @db.VarChar(255)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-<<<<<<< HEAD
   type      UserType  @default(USER)
   favorites   Favorite[]
-=======
->>>>>>> parent of 187282f (Add post)
   posts     Post[]
   sessions  Session[]
-  likes      Like[]
 }
 
 model Session {
@@ -62,12 +62,22 @@ model Session {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
-model Like {
+model Favorite {
   id        Int      @id @default(autoincrement())
   postId    Int
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId    Int
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  postId    Int
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }

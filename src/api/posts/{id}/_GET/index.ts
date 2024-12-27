@@ -13,7 +13,7 @@ export const getPost = errorCatcher(async (req: Request, res: Response) => {
         },
         include: {
             author: true,
-            likes: {
+            favorites: {
                 where: {
                     userId: req.user?.id,
                 },
@@ -21,7 +21,7 @@ export const getPost = errorCatcher(async (req: Request, res: Response) => {
         },
     });
 
-    const likes = await prisma.like.groupBy({
+    const likes = await prisma.favorite.groupBy({
         by: ['postId'],
         _count: {
             postId: true,
@@ -44,10 +44,10 @@ export const getPost = errorCatcher(async (req: Request, res: Response) => {
     }
 
     const serializedPost = Post.fromPrisma(
-        post,
+        post as any, // TODO
         post.author,
         likes[0]?._count.postId || 0,
-        req.user?.id ? post.likes.length > 0 : null,
+        req.user?.id ? post.favorites.length > 0 : null,
     );
 
     res.status(200).json({

@@ -33,7 +33,6 @@ import { getUser } from './api/users/{id}/_GET';
 import { whoAmI } from './api/who-am-i/_GET';
 import { requestLogger } from './middlewares/request-logger';
 import { cors } from './middlewares/cors';
-<<<<<<< HEAD
 import { multiImage } from './middlewares/multi-image';
 import { getUsersQuerySchema } from './api/users/_GET/query';
 import { getUsers } from './api/users/_GET';
@@ -44,8 +43,6 @@ import { createUserDtoSchema } from './api/users/_POST/dto';
 import { editUser } from './api/users/{id}/_PATCH';
 import { deleteUserParamsSchema } from './api/users/{id}/_DELETE/params';
 import { deleteUser } from './api/users/{id}/_DELETE';
-=======
->>>>>>> parent of 187282f (Add post)
 
 const app: Express = express();
 
@@ -59,8 +56,8 @@ app.get('/posts', auth(false), query(getPostsQuerySchema), getPosts);
 app.post(
     '/posts',
     auth(),
-    singleImage,
-    dto(createPostDtoSchema, true),
+    multiImage,
+    dto(createPostDtoSchema, 'none'),
     createPost,
 );
 

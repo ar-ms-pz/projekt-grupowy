@@ -1,7 +1,7 @@
 import { Session, User as PrismaUser } from '@prisma/client';
 import { Request, Response } from 'express';
 import { prisma } from '../../../../db/prisma';
-import { generateToken } from '../../../../auth/generateToken';
+import { generateToken } from '../../../../auth/generate-token';
 import {
     COOKIE_DOMAIN,
     COOKIE_NAME,

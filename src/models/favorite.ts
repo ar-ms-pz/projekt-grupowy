@@ -1,6 +1,6 @@
-import { Like as PrismaLike } from '@prisma/client';
+import { Favorite as PrismaFavorite } from '@prisma/client';
 
-export class Like {
+export class Favorite {
     id: number;
     postId: number;
     userId: number;
@@ -21,13 +21,13 @@ export class Like {
         this.updatedAt = updatedAt;
     }
 
-    static fromPrisma(like: PrismaLike): Like {
-        return new Like(
-            like.id,
-            like.postId,
-            like.userId,
-            like.createdAt,
-            like.updatedAt,
-        );
+    static fromPrisma({
+        id,
+        postId,
+        userId,
+        createdAt,
+        updatedAt,
+    }: PrismaFavorite): Favorite {
+        return new Favorite(id, postId, userId, createdAt, updatedAt);
     }
 }

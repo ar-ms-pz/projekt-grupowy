@@ -3,7 +3,7 @@ import { errorCatcher } from '../../../../../middlewares/error-catcher';
 import { SetLikeParams } from './params';
 import { prisma } from '../../../../../db/prisma';
 import { User } from '@prisma/client';
-import { Like } from '../../../../../models/like';
+import { Favorite } from '../../../../../models/favorite';
 
 export const setLike = errorCatcher(async (req: Request, res: Response) => {
     const { postId } = req.params as unknown as SetLikeParams;
@@ -27,7 +27,7 @@ export const setLike = errorCatcher(async (req: Request, res: Response) => {
             ],
         });
 
-    const like = await prisma.like.findFirst({
+    const like = await prisma.favorite.findFirst({
         where: {
             postId,
             userId,
@@ -36,19 +36,19 @@ export const setLike = errorCatcher(async (req: Request, res: Response) => {
 
     if (setLike) {
         if (like) {
-            const serializedLike = Like.fromPrisma(like);
+            const serializedLike = Favorite.fromPrisma(like);
 
             return res.status(200).json({ data: serializedLike });
         }
 
-        const createdLike = await prisma.like.create({
+        const createdLike = await prisma.favorite.create({
             data: {
                 postId,
                 userId,
             },
         });
 
-        const serializedLike = Like.fromPrisma(createdLike);
+        const serializedLike = Favorite.fromPrisma(createdLike);
 
         return res.status(201).json({ data: serializedLike });
     }
@@ -57,7 +57,7 @@ export const setLike = errorCatcher(async (req: Request, res: Response) => {
         return res.status(200).json({ data: null });
     }
 
-    await prisma.like.delete({
+    await prisma.favorite.delete({
         where: {
             id: like.id,
         },
