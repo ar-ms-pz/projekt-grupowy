@@ -1,52 +1,50 @@
 import { Post as PrismaPost, User as PrismaUser } from '@prisma/client';
 import { User } from './user';
-import { PostWithCoordinates } from '../db/post-with-coordinates';
-import { Image } from './image';
 
 export class Post {
     public id: number;
-    public images: Image[];
-    public description: string;
+    public image: string;
+    public description: string | null;
     public createdAt: Date;
     public updatedAt: Date;
-    public author: User;
-    public favorites: number;
-    public isFavorite: boolean | null;
+    public author: User | null;
+    public likes: number;
+    public isLiked: boolean | null;
 
     constructor(
         id: number,
-        images: Image[],
-        description: string,
+        image: string,
         createdAt: Date,
         updatedAt: Date,
-        favorites: number,
-        isFavorite: boolean | null,
-        author: User,
+        likes: number,
+        isLiked: boolean | null,
+        description: string | null,
+        author: User | null,
     ) {
         this.id = id;
-        this.images = images;
+        this.image = image;
         this.description = description;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.author = author;
-        this.favorites = favorites;
-        this.isFavorite = isFavorite;
+        this.likes = likes;
+        this.isLiked = isLiked;
     }
 
     public static fromPrisma(
-        { id, createdAt, description, images, updatedAt }: PostWithCoordinates,
+        post: PrismaPost,
         author: PrismaUser,
-        favorites: number,
-        isFavorite: boolean | null = null,
+        likes: number,
+        isLiked: boolean | null = null,
     ): Post {
         return new Post(
-            id,
-            images.map((image) => Image.fromPrisma(image)),
-            description,
-            createdAt,
-            updatedAt,
-            favorites,
-            isFavorite,
+            post.id,
+            post.image,
+            post.createdAt,
+            post.updatedAt,
+            likes,
+            isLiked,
+            post.description,
             User.fromPrisma(author),
         );
     }

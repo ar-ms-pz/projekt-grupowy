@@ -34,8 +34,7 @@ export const deletePost = errorCatcher(async (req: Request, res: Response) => {
         },
     });
 
-    // TODO
-    // rmSync(post.images);
+    rmSync(post.image);
 
     res.status(200).json({
         data: null,
