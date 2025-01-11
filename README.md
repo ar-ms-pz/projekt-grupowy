@@ -14,7 +14,7 @@ Enter your database config in `db/.env.db` file or use existing one.
 `cd db && docker-compose -f docker-compose.yml up`
 
 b) Using your own database
-![install postGIS on your system](https://postgis.net/documentation/getting_started/)
+[install postGIS on your system](https://postgis.net/documentation/getting_started/)
 Create database
 `CREATE DATABASE dbname;`
 Open the database
