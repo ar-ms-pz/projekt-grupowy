@@ -59,6 +59,8 @@ b) Run production build
 
 `npm run build:run`
 
+App is accessible on `http://localhost:3000/`
+
 ### Done ✨
 
 ## Preview database records
