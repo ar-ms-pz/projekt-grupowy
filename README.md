@@ -15,10 +15,13 @@ Enter your database config in `db/.env.db` file or use existing one.
 
 b) Using your own database
 [install postGIS on your system](https://postgis.net/documentation/getting_started/)
+
 Create database
 `CREATE DATABASE dbname;`
+
 Open the database
 `\c dbname`
+
 Create postGIS extension on your database
 `CREATE EXTENSION "postgis";`
 
