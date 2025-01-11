@@ -12,8 +12,8 @@
         "build": "tsc",
         "build:run": "npm run build && node dist/index.js"
     },
-    "author": "",
-    "license": "ISC",
+    "author": "Adrian Rosicki, Piotr Zieliński, Mateusz Siwko",
+    "license": "MIT",
     "dependencies": {
         "@prisma/client": "^5.11.0",
         "@radix-ui/react-tooltip": "^1.1.6",
