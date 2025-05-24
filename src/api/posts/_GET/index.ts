@@ -19,6 +19,7 @@ interface PostReturnType {
     address: string;
     createdAt: Date;
     updatedAt: Date;
+    deletedAt: Date | null;
     authorId: number;
     longitude: number;
     latitude: number;

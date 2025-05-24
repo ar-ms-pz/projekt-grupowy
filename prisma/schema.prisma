@@ -11,6 +11,7 @@ enum PostStatus {
   DRAFT
   PUBLISHED
   ARCHIVED
+  DELETED
 }
 
 enum PostType {
@@ -43,6 +44,7 @@ model Post {
   @@index([coordinates], name: "location_idx", type: Gist)
 
   images       Image[]
+  deletedAt DateTime?
 }
 
 model User {

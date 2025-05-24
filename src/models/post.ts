@@ -10,6 +10,7 @@ export class Post {
     public description: string;
     public createdAt: Date;
     public updatedAt: Date;
+    public deletedAt: Date | null;
     public author: User;
     public favorites: number;
     public isFavorite: boolean | null;
@@ -29,6 +30,7 @@ export class Post {
         description: string,
         createdAt: Date,
         updatedAt: Date,
+        deletedAt: Date | null,
         favorites: number,
         isFavorite: boolean | null,
         author: User,
@@ -47,6 +49,7 @@ export class Post {
         this.description = description;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.deletedAt = deletedAt;
         this.author = author;
         this.favorites = favorites;
         this.isFavorite = isFavorite;
@@ -64,6 +67,7 @@ export class Post {
         {
             id,
             createdAt,
+            deletedAt,
             description,
             images,
             updatedAt,
@@ -88,6 +92,7 @@ export class Post {
             description,
             createdAt,
             updatedAt,
+            deletedAt,
             favorites,
             isFavorite,
             User.fromPrisma(author),

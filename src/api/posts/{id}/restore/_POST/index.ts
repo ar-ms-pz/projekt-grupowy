@@ -1,14 +1,13 @@
 import { Request, Response } from 'express';
-import { DeletePostParams } from './params';
-import { prisma } from '../../../../db/prisma';
-import { rmSync } from 'fs';
+import { PostRestorePostParams } from './params';
 import { User } from '@prisma/client';
-import { errorCatcher } from '../../../../middlewares/error-catcher';
-import { Coordinates } from '../../../../schemas/coordinates';
-import { Post } from '../../../../models/post';
+import { errorCatcher } from '../../../../../middlewares/error-catcher';
+import { prisma } from '../../../../../db/prisma';
+import { Coordinates } from '../../../../../schemas/coordinates';
+import { Post } from '../../../../../models/post';
 
-export const deletePost = errorCatcher(async (req: Request, res: Response) => {
-    const { postId } = req.params as unknown as DeletePostParams;
+export const restorePost = errorCatcher(async (req: Request, res: Response) => {
+    const { postId } = req.params as unknown as PostRestorePostParams;
     const { id: userId } = req.user as User;
 
     const post = await prisma.post.findFirst({
@@ -33,13 +32,25 @@ export const deletePost = errorCatcher(async (req: Request, res: Response) => {
         });
     }
 
+    if (post.status !== 'DELETED') {
+        return res.status(400).json({
+            errors: [
+                {
+                    message: 'Post is not deleted',
+                    path: ['postId'],
+                    code: 'not_deleted',
+                },
+            ],
+        });
+    }
+
     const updatedPost = await prisma.post.update({
         where: {
             id: postId,
         },
         data: {
-            status: 'DELETED',
-            deletedAt: new Date(),
+            status: 'ARCHIVED',
+            deletedAt: null,
         },
         include: {
             images: true,

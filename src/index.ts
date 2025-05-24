@@ -13,7 +13,11 @@ import { getPostParamsSchema } from './api/posts/{id}/_GET/params';
 import { deletePostParamsSchema } from './api/posts/{id}/_DELETE/params';
 import { editPostParamsSchema } from './api/posts/{id}/_PATCH/params';
 import { editPostDtoSchema } from './api/posts/{id}/_PATCH/dto';
-import { PORT, SESSION_CLEANUP_INTERVAL_MS } from './config';
+import {
+    PORT,
+    DELETED_POST_CLEANUP_INTERVAL,
+    SESSION_CLEANUP_INTERVAL_MS,
+} from './config';
 import { clearExpiredSessions } from './auth/clear-expired-sessions';
 import { createJob } from './jobs/create-job';
 import { auth } from './middlewares/auth';
@@ -43,6 +47,9 @@ import { createUserDtoSchema } from './api/users/_POST/dto';
 import { editUser } from './api/users/{id}/_PATCH';
 import { deleteUserParamsSchema } from './api/users/{id}/_DELETE/params';
 import { deleteUser } from './api/users/{id}/_DELETE';
+import { clearDeletedPosts } from './db/clear-deleted-posts';
+import { postRestorePostParamsSchema } from './api/posts/{id}/restore/_POST/params';
+import { restorePost } from './api/posts/{id}/restore/_POST';
 
 const app: Express = express();
 
@@ -69,6 +76,13 @@ app.delete(
     auth(),
     params(deletePostParamsSchema),
     deletePost,
+);
+
+app.post(
+    '/posts/:postId/restore',
+    auth(),
+    params(postRestorePostParamsSchema),
+    restorePost,
 );
 
 app.post(
@@ -110,3 +124,4 @@ app.listen(PORT, () => {
 });
 
 createJob(clearExpiredSessions, SESSION_CLEANUP_INTERVAL_MS);
+createJob(clearDeletedPosts, DELETED_POST_CLEANUP_INTERVAL);

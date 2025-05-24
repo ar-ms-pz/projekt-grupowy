@@ -35,7 +35,10 @@ export const getPost = errorCatcher(async (req: Request, res: Response) => {
         });
     }
 
-    if (post.status === 'DRAFT' && post.authorId !== req.user?.id) {
+    if (
+        (post.status === 'DRAFT' || post.status === 'DELETED') &&
+        post.authorId !== req.user?.id
+    ) {
         return res.status(403).json({
             errors: [
                 {

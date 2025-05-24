@@ -154,6 +154,7 @@ export const getPostsQuerySchema = z
                             PostStatus.DRAFT,
                             PostStatus.PUBLISHED,
                             PostStatus.ARCHIVED,
+                            PostStatus.DELETED,
                         ],
                         {
                             invalid_type_error: `Status must be one of "${PostStatus.DRAFT}", "${PostStatus.PUBLISHED}", or "${PostStatus.ARCHIVED}".`,
