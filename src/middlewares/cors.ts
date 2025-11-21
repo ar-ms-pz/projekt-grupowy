@@ -4,9 +4,10 @@ import { ACCESS_CONTROL_ALLOW_ORIGIN } from '../config';
 export const cors = (req: Request, res: Response, next: NextFunction) => {
     const origins = ACCESS_CONTROL_ALLOW_ORIGIN.split(',');
 
-    origins.forEach(origin => {
+    if (origins.includes(origin)) {
         res.header('Access-Control-Allow-Origin', origin);
-    });
+    }
+
     res.header( 
         'Access-Control-Allow-Methods',
         'GET, POST, PATCH, DELETE, OPTIONS',
