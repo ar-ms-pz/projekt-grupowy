@@ -3,6 +3,7 @@ import { ACCESS_CONTROL_ALLOW_ORIGIN } from '../config';
 
 export const cors = (req: Request, res: Response, next: NextFunction) => {
     const origins = ACCESS_CONTROL_ALLOW_ORIGIN.split(',');
+    const origin = req.headers.origin || '';
 
     if (origins.includes(origin)) {
         res.header('Access-Control-Allow-Origin', origin);
