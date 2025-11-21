@@ -3,7 +3,6 @@ import { Request, Response } from 'express';
 import { prisma } from '../../../../db/prisma';
 import { generateToken } from '../../../../auth/generate-token';
 import {
-    COOKIE_DOMAIN,
     COOKIE_NAME,
     SESSION_LENGTH_MS,
 } from '../../../../config';
@@ -36,7 +35,7 @@ export const extendSession = errorCatcher(
             httpOnly: true,
             sameSite: 'none',
             secure: true,
-            domain: COOKIE_DOMAIN,
+            domain: req.headers.origin || '',
         });
 
         const user = User.fromPrisma(req.user as PrismaUser);

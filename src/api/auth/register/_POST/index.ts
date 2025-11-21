@@ -4,7 +4,6 @@ import { prisma } from '../../../../db/prisma';
 import { hash } from 'argon2';
 import { generateToken } from '../../../../auth/generate-token';
 import {
-    COOKIE_DOMAIN,
     COOKIE_NAME,
     SESSION_LENGTH_MS,
 } from '../../../../config';
@@ -59,7 +58,7 @@ export const register = async (req: Request, res: Response) => {
         httpOnly: true,
         sameSite: 'none',
         secure: true,
-        domain: COOKIE_DOMAIN,
+        domain: req.headers.origin || '',
     });
 
     const serializedUser = User.fromPrisma(user);
