@@ -15,3 +15,5 @@ export const DELETED_POST_CLEANUP_INTERVAL = +(
 );
 
 export const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN ?? 'localhost';
+
+export const ACCESS_CONTROL_ALLOW_ORIGIN = process.env.ACCESS_CONTROL_ALLOW_ORIGIN ?? 'http://localhost:5173';
