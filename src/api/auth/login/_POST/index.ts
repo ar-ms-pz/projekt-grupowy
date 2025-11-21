@@ -4,7 +4,6 @@ import { prisma } from '../../../../db/prisma';
 import { hash, verify } from 'argon2';
 import { generateToken } from '../../../../auth/generate-token';
 import {
-    COOKIE_DOMAIN,
     COOKIE_NAME,
     SESSION_LENGTH_MS,
 } from '../../../../config';
@@ -64,12 +63,13 @@ export const login = errorCatcher(async (req: Request, res: Response) => {
         },
     });
 
+
     res.cookie(COOKIE_NAME, serializeSession(session, token), {
         expires: tokenExpiry,
         httpOnly: true,
         sameSite: 'none',
         secure: true,
-        domain: COOKIE_DOMAIN,
+        domain: req.headers.origin || '',
     });
 
     const serializedUser = User.fromPrisma(user);
