@@ -7,6 +7,7 @@ import { errorCatcher } from '../../../../middlewares/error-catcher';
 import { Post } from '../../../../models/post';
 import { Coordinates } from '../../../../schemas/coordinates';
 import { rmSync } from 'fs';
+import { IMAGE_UPLOAD_PATH } from '../../../../config';
 
 export const editPost = errorCatcher(async (req: Request, res: Response) => {
     const { postId } = req.params as unknown as EditPostParams;
@@ -48,7 +49,7 @@ export const editPost = errorCatcher(async (req: Request, res: Response) => {
 
         imagesToRemove.forEach((image) => {
             try {
-                rmSync(`images/${image.name}`);
+                rmSync(`${IMAGE_UPLOAD_PATH}/${image.name}`);
             } catch (error) {}
         });
     }

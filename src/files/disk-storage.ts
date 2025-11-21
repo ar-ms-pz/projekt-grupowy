@@ -1,8 +1,9 @@
 import multer from 'multer';
+import { IMAGE_UPLOAD_PATH } from '../config';
 
 export const diskImageStorage = multer.diskStorage({
     destination: (req, _file, cb) => {
-        cb(null, 'images/');
+        cb(null, `${IMAGE_UPLOAD_PATH}/`);
     },
     filename: (_req, file, cb) => {
         const timestamp = Date.now();

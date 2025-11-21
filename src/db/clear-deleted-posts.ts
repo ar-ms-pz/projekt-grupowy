@@ -1,5 +1,5 @@
 import { rmSync } from 'fs';
-import { DELETED_POST_TTL } from '../config';
+import { DELETED_POST_TTL, IMAGE_UPLOAD_PATH } from '../config';
 import { prisma } from '../db/prisma';
 
 export const clearDeletedPosts = async () => {
@@ -26,7 +26,7 @@ export const clearDeletedPosts = async () => {
     postsToDelete.forEach((post) => {
         post.images.forEach((image) => {
             try {
-                rmSync(`images/${image.name}`);
+                rmSync(`${IMAGE_UPLOAD_PATH}/${image.name}`);
             } catch (error) {
                 console.error(
                     `Failed to delete image ${image.name} in post ${post.id}:`,
