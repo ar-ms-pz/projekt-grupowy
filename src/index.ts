@@ -17,6 +17,7 @@ import {
     PORT,
     DELETED_POST_CLEANUP_INTERVAL,
     SESSION_CLEANUP_INTERVAL_MS,
+    IMAGE_UPLOAD_PATH,
 } from './config';
 import { clearExpiredSessions } from './auth/clear-expired-sessions';
 import { createJob } from './jobs/create-job';
@@ -57,7 +58,7 @@ app.use(requestLogger);
 app.use(cors);
 app.use(json());
 app.use(cookieParser());
-app.use('/images', express.static('images'));
+app.use('/images', express.static(IMAGE_UPLOAD_PATH));
 
 app.get('/posts', auth(false), query(getPostsQuerySchema), getPosts);
 app.post('/posts', auth(), multiImage, dto(createPostDtoSchema), createPost);

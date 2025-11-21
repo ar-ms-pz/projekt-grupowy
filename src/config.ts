@@ -15,3 +15,5 @@ export const DELETED_POST_CLEANUP_INTERVAL = +(
 );
 
 export const ACCESS_CONTROL_ALLOW_ORIGINS = process.env.ACCESS_CONTROL_ALLOW_ORIGIN ? process.env.ACCESS_CONTROL_ALLOW_ORIGIN.split(",") : ['http://localhost:5173'];
+
+export const IMAGE_UPLOAD_PATH = process.env.IMAGE_UPLOAD_PATH ?? './images';
