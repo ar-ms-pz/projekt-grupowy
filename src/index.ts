@@ -17,7 +17,6 @@ import {
     PORT,
     DELETED_POST_CLEANUP_INTERVAL,
     SESSION_CLEANUP_INTERVAL_MS,
-    ACCESS_CONTROL_ALLOW_ORIGIN,
 } from './config';
 import { clearExpiredSessions } from './auth/clear-expired-sessions';
 import { createJob } from './jobs/create-job';
@@ -55,7 +54,7 @@ import { restorePost } from './api/posts/{id}/restore/_POST';
 const app: Express = express();
 
 app.use(requestLogger);
-app.use(cors({ origin: ACCESS_CONTROL_ALLOW_ORIGIN }));
+app.use(cors);
 app.use(json());
 app.use(cookieParser());
 app.use('/images', express.static('images'));
