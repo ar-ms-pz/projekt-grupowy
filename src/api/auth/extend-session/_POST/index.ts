@@ -35,7 +35,7 @@ export const extendSession = errorCatcher(
             httpOnly: true,
             sameSite: 'none',
             secure: true,
-            domain: req.headers.origin || '',
+            domain: req.headers.origin?.replace('https://', '').replace('http://', '') || '',
         });
 
         const user = User.fromPrisma(req.user as PrismaUser);

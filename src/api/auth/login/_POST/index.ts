@@ -69,7 +69,7 @@ export const login = errorCatcher(async (req: Request, res: Response) => {
         httpOnly: true,
         sameSite: 'none',
         secure: true,
-        domain: req.headers.origin || '',
+        domain: req.headers.origin?.replace('https://', '').replace('http://', '') || '',
     });
 
     const serializedUser = User.fromPrisma(user);
